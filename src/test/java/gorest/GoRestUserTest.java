@@ -26,7 +26,6 @@ public class GoRestUserTest {
         reqSpec = new RequestSpecBuilder()
                 .setBaseUri("https://gorest.co.in")
                 .addHeader("Authorization", "Bearer ecb8cf5d97b3ac267e2add8243779043280018a78c26f40e9c5f2e2642f2c4ff")
-                .setContentType(ContentType.JSON)
                 .build();
 
         resSepc = new ResponseSpecBuilder()
@@ -44,14 +43,19 @@ public class GoRestUserTest {
 
     // Test1: Create a user
     int id;
+    String name;
+    String gender;
+    String email;
+    String status;
 
-    @Test
+    @Test(testName = "createUser")
     public void test1_createUser() {
         String json = getJsonData();
 
         // gelen json'i response içine kaydettim
         Response response = given()
                 .spec(reqSpec)
+                .contentType(ContentType.JSON)
                 .body(json)
                 .when()
                 .post("/public/v2/users")
@@ -61,8 +65,12 @@ public class GoRestUserTest {
                 .extract().response();
 
         id = response.jsonPath().get("id");
-        String name = response.jsonPath().get("name");
-        String email = response.jsonPath().getString("email");
+        name = response.jsonPath().get("name");
+        email = response.jsonPath().get("email");
+        gender = response.jsonPath().get("gender");
+        status = response.jsonPath().get("status");
+
+
 
 /*
         id = given()
@@ -81,7 +89,34 @@ public class GoRestUserTest {
 //        System.out.println(res.jsonPath().prettyPrint());
     }
 
-    // Test2v
+    // Test2: Kaydedilen json datayi guncelleyin
+    @Test(dependsOnMethods = "test1_createUser")
+    public void test2_updateUser() {
+        Response response = given()
+                .spec(reqSpec)
+                .body(getJsonData())
+                .when()
+                .put("/public/v2/users/" + id)
+                .then()
+                .log().body()
+                .spec(resSepc)
+                .extract().response();
+        System.out.println(response.jsonPath().get("name").toString());
+
+    }
+
+    @Test(dependsOnMethods = "test1_createUser", priority = 1)
+    public void test3_deleteUser() {
+        given()
+                .spec(reqSpec)
+                .body(getJsonData())
+                .when()
+                .delete("/public/v2/users/" + id)
+                .then()
+                .log().body()
+                .statusCode(oneOf(200, 201, 204));
+    }
+
 
     public String getJsonData() {
         String[] genders = {"male", "female"};

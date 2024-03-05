@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="All Test Suite">
+    <test verbose="2" preserve-order="true"
+          name="C:/Users/e 15/IdeaProjects/RestAssured/src/test/java/gorest/GoRestUserTest.java">
+        <classes>
+            <class name="gorest.GoRestUserTest">
+                <methods>
+                    <include name="test1_createUser"/>
+                    <include name="test2_updateUser"/>
+                    <include name="test3_deleteUser"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+</suite>
