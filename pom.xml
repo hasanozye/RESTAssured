@@ -49,12 +49,11 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M1</version>
                 <configuration>
-
-                    <includes>
-                        <!-- for  run class or classes  **/:bulunduğu lokasyonu bütün klasörlere göre bulabiliyor   -->
-                        <include>**/Runner.java</include>
-                    </includes>
-                    <testFailureIgnore>true</testFailureIgnore>
+                    <suiteXmlFiles>
+                        <xmlFile>
+                            src/test/resources/testng.xml
+                        </xmlFile>
+                    </suiteXmlFiles>
                 </configuration>
             </plugin>
 
