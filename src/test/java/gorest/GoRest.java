@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static io.restassured.RestAssured.given;
+import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
 public class GoRest {
@@ -134,5 +134,27 @@ public class GoRest {
                 .contentType(ContentType.JSON)
         ;*/
     }
+
+    @Test
+    public void getAUserGetInAClass() {
+        User user = get("https://gorest.co.in/public/v2/users/6761988")
+                .then()
+                .statusCode(200)
+                .log().body()
+                .extract().as(User.class);
+        System.out.println(user);
+        System.out.println(user.getName());
+        System.out.println(user.getEmail());
+
+    }
+
+
+    /*
+    Yeni bir  class açin
+    createUser'i map ile create edin
+    id'yi alin
+    kaydedilen user'i get yapıp user class'ina map edin
+    User nesnesinin attribute'larının sout iel yazdırın
+     */
 
 }
