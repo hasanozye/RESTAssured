@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Random;
 
 import static io.restassured.RestAssured.*;
+import static io.restassured.path.json.JsonPath.from;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.*;
 
@@ -101,12 +102,98 @@ public class Rest2 {
                 .statusCode(200)
                 .spec(resSpec)
                 .log().body()
-                .extract().jsonPath().getList("", User.class)
-                ;
+                .extract().jsonPath().getList("", User.class);
 
-        for (User user: users){
+        for (User user : users) {
             System.out.println(user);
             System.out.println("-".repeat(24));
         }
     }
+
+    @Test
+    public void getResponse() {
+        Response response = get("https://gorest.co.in/public/v2/users/6762681")
+                .then().extract().response();
+
+        String name = response.path("name");
+        String email = response.jsonPath().getString("email");
+        System.out.println("name = " + name);
+        System.out.println("email = " + email);
+    }
+
+    @Test
+    public void getResponse1() {
+        String response = get("https://gorest.co.in/public/v2/users/6762681")
+                .asString();
+
+        String name = from(response).get("name");
+        String email = from(response).get("email");
+        System.out.println("name = " + name);
+        System.out.println("email = " + email);
+    }
+
+
 }
+
+
+/*
+[
+    {
+        "id": 6762684,
+        "name": "Agrata Dwivedi",
+        "email": "dwivedi_agrata@fay.test",
+        "gender": "female",
+        "status": "inactive"
+    },
+    {
+        "id": 6762681,
+        "name": "Chatura Khatri",
+        "email": "khatri_chatura@daugherty.test",
+        "gender": "female",
+        "status": "active"
+    },
+]
+
+    body array olarak return edilmiş
+    .extract().jsonPath().getList("", User.class)
+    .extract().jsonPath().getList("$", User.class)
+
+    "", "$"  : jsonBody anlamina gelir
+
+
+
+
+        json asagidaki gibi ise :
+{
+    "type" : "user",
+    "users":[
+        {
+        "id": 6762684,
+        "name": "Agrata Dwivedi",
+        "email": "dwivedi_agrata@fay.test",
+        "gender": "female",
+        "status": "inactive"
+    },
+    {
+        "id": 6762681,
+        "name": "Chatura Khatri",
+        "email": "khatri_chatura@daugherty.test",
+        "gender": "female",
+        "status": "active"
+    },
+    ]
+}
+        body object olarak return edilmiş
+        List <User> listOfUser = given()...extract().jsonPath().getList("users", User.class)
+        Main main = given()...extract().as(Main.class)
+
+        class Main{
+        String type;
+        ArrayList<User> users;
+
+        }
+
+ */
+
+
+
