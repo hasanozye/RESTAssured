@@ -10,7 +10,11 @@ import io.restassured.specification.ResponseSpecification;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import zippo.pojoclasses.Location;
+import zippo.pojoclasses.Place;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -192,10 +196,10 @@ public class Zippo2 {
                 .extract().response();
 
         List<String> placeNames = response.then().extract().path("places.'place name'");
-        Assert.assertEquals(placeNames.size(),18);
+        Assert.assertEquals(placeNames.size(), 18);
         String longestPlaceName = "";
-        for (String placeName :placeNames){
-            if (placeName.length() > longestPlaceName.length()){
+        for (String placeName : placeNames) {
+            if (placeName.length() > longestPlaceName.length()) {
                 longestPlaceName = placeName;
             }
         }
@@ -203,5 +207,62 @@ public class Zippo2 {
         System.out.println("En uzun 'place name': " + longestPlaceName);
         System.out.println("Uzunluğu: " + longestPlaceName.length());
 
+    }
+
+
+    // json datasini pojo'ya map edin
+    @Test
+    public void test8_getDataToPojo() {
+        Response response = given()
+                .spec(requestSpecification)
+                .when()
+                .get("/TR/06080")
+                .then()
+                .spec(responseSpecification)
+                .extract().response();
+
+        Location location = response.then().extract().as(Location.class);
+
+        System.out.println(location.getPlaces());
+        System.out.println(location.getPlaces().get(0).getPlaceName());
+
+    }
+
+    // Ankaranin tüm mahallelerini bulun
+
+    @Test
+    public void test9_getDataToPojo() throws IOException {
+
+        FileWriter fileWriter = new FileWriter("Places.txt");
+        for (int i = 6070; i < 6090; i++) {
+            String postCode = getPostaKodu(i);
+            Response response = given()
+                    .spec(requestSpecification)
+                    .pathParams("postaKodu", postCode)
+                    .when()
+                    .get("/TR/{postaKodu}")
+                    .then()
+                    .extract().response();
+            Location location = response.then().extract().as(Location.class);
+            if (location.getPlaces() != null) {
+                for (Place place : location.getPlaces()) {
+                    String str = location.getCountry() + "\t" +
+                            place.getState() + "\t" +
+                            place.getPlaceName() + "\n";
+
+                    fileWriter.write(str);
+                }
+            }
+        }
+        fileWriter.close();
+    }
+
+    public String getPostaKodu(int num) {
+        String code = String.valueOf(num);
+
+        for (int i = code.length(); i < 5; i++) {
+            code = "0".concat(code);
+        }
+        return code;
     }
 }
