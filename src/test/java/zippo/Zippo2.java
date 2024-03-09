@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.filter.log.LogDetail;
+import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import org.testng.Assert;
@@ -12,6 +13,7 @@ import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.*;
@@ -69,7 +71,7 @@ public class Zippo2 {
     // places'larda tüm state'lerin ankara oldugunu assert edin
     @Test
     public void test3_GetDataAllStatesAreAnkara() {
-        for (int i = 0; i < 18; i++) {
+/*       for (int i = 0; i < 18; i++) {
 
 
             given()
@@ -79,9 +81,22 @@ public class Zippo2 {
                     .then()
                     .spec(responseSpecification)
                     .statusCode(200)
-                    .body("places[" + i + "].state", equalTo("Ankara"));
-        }
+                    .body("places[" + i + "].state", equalTo("Ankara"));}*/
+
+
+        // json'daki places'in siez'i 18 dir
+        given()
+                .spec(requestSpecification)
+                .when()
+                .get("/TR/06080")
+                .then()
+                .spec(responseSpecification)
+                .body("places.findAll{it.state == 'Ankara'}", hasSize(18))
+                .body("places.findAll{it.state != 'Ankara'}", hasSize(0))
+
+        ;
     }
+
 
     public static void main(String[] args) {
         ArrayList<Integer> list = new ArrayList<>(Arrays.asList(2, 4, 6));
@@ -89,5 +104,95 @@ public class Zippo2 {
         int evenNumCount = (int) list.stream().filter(n -> n % 2 == 0).count();
 
         int oddNumCount = (int) list.stream().filter(n -> n % 2 == 1).count();
+    }
+
+
+    // TR ve 06080 yerine pathParam kullaniniz
+    @Test
+    public void test4_getDataUsePathParam() {
+
+        String country = "TR";
+        String postCode = "06080";
+        given()
+                .spec(requestSpecification)
+                .pathParams("ulke", country)
+                .pathParams("postaKodu", postCode)
+                .when()
+                .get("/{ulke}/{postaKodu}")
+                .then()
+                .spec(responseSpecification)
+                .body("places.findAll{it.state == 'Ankara'}", hasSize(18))
+                .body("places.findAll{it.state != 'Ankara'}", hasSize(0))
+        ;
+    }
+
+    // country extract edin ve Turkey oldugun assert edin
+    // 3. mahallenin adini extract edin ve Sokullu Mah. oldugunu assert edin
+    @Test
+    public void test5_getDataExtractPlaceName() {
+
+        /*
+
+
+        String placeName = "";
+        */
+
+        String country = given()
+                .spec(requestSpecification)
+                .when()
+                .get("/TR/06080")
+                .then()
+                .spec(responseSpecification)
+                .extract().path("country");
+
+//        String country = "";
+        Assert.assertEquals(country, "Turkey");
+
+        String placeName = given()
+                .when()
+                .get("/TR/06080")
+                .then()
+                .spec(responseSpecification)
+                .extract().path("places[2].'place name'");
+        Assert.assertEquals(placeName, "Sokullu Mah.");
+
+    }
+
+
+    @Test
+    public void test5_getDataExtractPlaceName1() {
+        Response response = given()
+                .spec(requestSpecification)
+                .when()
+                .get("/TR/06080")
+                .then()
+                .spec(responseSpecification)
+                .extract().response();
+
+        String country = response.then().extract().path("country");
+        Assert.assertEquals(country, "Turkey");
+
+        String placeName = response.then().extract().jsonPath().get("places[2].'place name'");
+        Assert.assertEquals(placeName, "Sokullu Mah.");
+        response.prettyPrint();
+
+    }
+
+
+    // mahalle isimlerini liste olarak extract edin
+
+    @Test
+    public void test5_getDataExtractMahalleName1() {
+        Response response = given()
+                .spec(requestSpecification)
+                .when()
+                .get("/TR/06080")
+                .then()
+                .spec(responseSpecification)
+                .extract().response();
+
+        List<String> placeNames = response.then().extract().path("places.'place name'");
+        System.out.println("placeNames = " + placeNames);
+
     }
 }
