@@ -86,7 +86,8 @@ public class Zippo2 {
     public static void main(String[] args) {
         ArrayList<Integer> list = new ArrayList<>(Arrays.asList(2, 4, 6));
 
-        Assert.assertEquals(
-                list.stream().filter(n -> n % 2 == 0).toList().size(), list.size());
+        int evenNumCount = (int) list.stream().filter(n -> n % 2 == 0).count();
+
+        int oddNumCount = (int) list.stream().filter(n -> n % 2 == 1).count();
     }
 }
