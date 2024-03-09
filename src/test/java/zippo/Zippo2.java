@@ -179,7 +179,7 @@ public class Zippo2 {
     }
 
 
-    // mahalle isimlerini liste olarak extract edin
+    // mahalle isimlerini liste olarak extract edin, size 18 oldugnu assert edin
 
     @Test
     public void test5_getDataExtractMahalleName1() {
@@ -192,7 +192,16 @@ public class Zippo2 {
                 .extract().response();
 
         List<String> placeNames = response.then().extract().path("places.'place name'");
+        Assert.assertEquals(placeNames.size(),18);
+        String longestPlaceName = "";
+        for (String placeName :placeNames){
+            if (placeName.length() > longestPlaceName.length()){
+                longestPlaceName = placeName;
+            }
+        }
         System.out.println("placeNames = " + placeNames);
+        System.out.println("En uzun 'place name': " + longestPlaceName);
+        System.out.println("Uzunluğu: " + longestPlaceName.length());
 
     }
 }
