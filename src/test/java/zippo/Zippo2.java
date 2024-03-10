@@ -257,6 +257,28 @@ public class Zippo2 {
         fileWriter.close();
     }
 
+
+    @Test
+    public void get1Data() {
+        Response response = given()
+                .spec(requestSpecification)
+                .pathParams("postaKodu", "01000")
+                .when()
+                .get("/TR/{postaKodu}")
+                .then()
+                .extract().response();
+
+        Location location = response.then().extract().as(Location.class);
+        if (location.getPlaces() != null) {
+            for (Place place : location.getPlaces()) {
+                String str = location.getCountry() + "\t" +
+                        place.getState() + "\t" +
+                        place.getPlaceName() + "\n";
+                System.out.println(str);
+            }
+        }
+    }
+
     public String getPostaKodu(int num) {
         String code = String.valueOf(num);
 
