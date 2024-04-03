@@ -74,19 +74,6 @@ public class GoRestUserTest {
         status = response.jsonPath().get("status");
 
 
-
-/*
-        id = given()
-                .spec(reqSpec)
-                .body(json)
-                .when()
-                .post("/public/v2/users")
-                .then()
-                .log().body()
-                .spec(resSepc)
-                .extract().jsonPath().get("id")
-        ;*/
-
         System.out.println("id : " + id);
 //        Response res = get("https://gorest.co.in/public/v2/users");
 //        System.out.println(res.jsonPath().prettyPrint());
@@ -135,14 +122,6 @@ public class GoRestUserTest {
                 "\"gender\":\"" + gender + "\", " +
                 "\"status\":\"" + status + "\"" +
                 "}";
-
-        /*String json = """
-                {
-                        "name": "HASSİİİ",
-                        "email": "hasktracxcblandxaa@example",
-                        "gender": "female",
-                        "status": "active"
-                    }""";*/
 
         return jsonReel;
     }
